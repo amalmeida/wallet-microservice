@@ -26,7 +26,7 @@ A REST microservice built with Spring Boot to manage user wallets, implemented w
 ### Local Installation
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/wallet-microservice.git
+   git clone https://github.com/amalmeida/wallet-microservice.git
    cd wallet-microservice
    ```
 2. Compile and package the project:
