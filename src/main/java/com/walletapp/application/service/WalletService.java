@@ -1,5 +1,7 @@
 package com.walletapp.application.service;
 
+import com.walletapp.domain.exception.InvalidDateFormatException;
+import com.walletapp.domain.exception.WalletNotFoundException;
 import com.walletapp.domain.model.Transaction;
 import com.walletapp.domain.model.TransactionType;
 import com.walletapp.domain.model.Wallet;
@@ -13,6 +15,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.UUID;
 
 @Service
@@ -43,14 +47,22 @@ public class WalletService {
         return wallet.getBalance();
     }
 
-    public BigDecimal retrieveHistoricalBalance(UUID walletId, LocalDateTime dateTime) {
-        logger.debug("Consultando saldo histórico da carteira: {} em {}", walletId, dateTime);
+    public BigDecimal retrieveHistoricalBalance(UUID walletId, String dateTime) {
+        logger.info("Consultando saldo histórico da carteira: {} em {}", walletId, dateTime);
+
+        LocalDateTime at;
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd[ HH:mm:ss][\'T\'HH:mm:ss]");
+            at = LocalDateTime.parse(dateTime, formatter);
+        } catch (DateTimeParseException e) {
+            logger.error("Formato de data inválido: {}. Use o formato 'yyyy-MM-dd HH:mm:ss' ou 'yyyy-MM-ddTHH:mm:ss'", dateTime);
+            throw new InvalidDateFormatException("Formato de data inválido. Use 'yyyy-MM-dd HH:mm:ss' ou 'yyyy-MM-ddTHH:mm:ss'");
+        }
+
         walletRepository.findById(walletId)
-                .orElseThrow(() -> {
-                    logger.error("Carteira não encontrada: {}", walletId);
-                    return new IllegalArgumentException("Carteira não encontrada");
-                });
-        return walletRepository.getHistoricalBalance(walletId, dateTime);
+                .orElseThrow(() -> new WalletNotFoundException(walletId));
+
+        return walletRepository.getHistoricalBalance(walletId, at);
     }
 
     @Transactional

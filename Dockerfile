@@ -1,5 +1,8 @@
 # Dockerfile
-FROM openjdk:21.0.6-jdk-slim AS builder
+FROM openjdk:21-jdk-slim AS builder
+
+# Define o Timezone
+ENV TZ=UTC
 
 WORKDIR /walletapp
 
@@ -10,7 +13,7 @@ COPY src ./src
 RUN apt-get update && apt-get install -y maven && mvn clean package -DskipTests
 
 # Imagem final para rodar a aplicação
-FROM openjdk:21.0.6-jdk-slim
+FROM openjdk:21-jdk-slim
 
 WORKDIR /walletapp
 

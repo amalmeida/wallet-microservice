@@ -20,7 +20,6 @@ public class Wallet {
         this.createdAt = LocalDateTime.now();
     }
 
-    // Construtor para conversão de entidade
     public Wallet(UUID id, UUID userId, BigDecimal balance, LocalDateTime createdAt) {
         this.id = id;
         this.userId = userId;
